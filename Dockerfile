@@ -20,8 +20,6 @@ RUN pip install --no-cache-dir \
     uvicorn[standard]==0.29.0 \
     python-multipart==0.0.9 \
     pillow==10.3.0 \
-    "numpy==1.26.4" \
-    tensorflow-cpu==2.16.1 \
     requests==2.31.0 \
     httpx==0.27.0 \
     "ultralytics==8.2.0" \
