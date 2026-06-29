@@ -31,10 +31,10 @@ COPY --chown=user:user . .
 # Pull actual YOLO model binary if Railway cloned only the Git LFS pointer
 RUN if head -c 50 model/yolobv11/best.pt 2>/dev/null | grep -q "version https://git-lfs"; then \
     echo "Pulling YOLO model via git-lfs (Railway skipped LFS during clone)..." && \
-    GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --no-tags \
+    GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --no-tags \
         https://github.com/trantan66/nutrivision-ai.git /tmp/lfs-repo && \
     cd /tmp/lfs-repo && \
-    git lfs pull --include="model/yolobv11/best.pt" && \
+    GIT_TERMINAL_PROMPT=0 git lfs pull --include="model/yolobv11/best.pt" && \
     cp model/yolobv11/best.pt /app/model/yolobv11/best.pt && \
     chown user:user /app/model/yolobv11/best.pt && \
     cd / && rm -rf /tmp/lfs-repo && \
