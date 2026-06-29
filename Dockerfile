@@ -9,12 +9,15 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# Install torch CPU-only first (saves ~1.3GB vs CUDA build)
+# Pin numpy 1.x FIRST — pip will not upgrade an already-satisfied constraint
+RUN pip install --no-cache-dir "numpy==1.26.4"
+
+# Install torch CPU-only (uses the already-installed numpy 1.26.4)
 RUN pip install --no-cache-dir \
     torch==2.3.0 torchvision==0.18.0 \
     --index-url https://download.pytorch.org/whl/cpu
 
-# Install remaining dependencies
+# Install remaining dependencies (numpy already satisfied, pip won't upgrade)
 RUN pip install --no-cache-dir \
     fastapi==0.111.0 \
     uvicorn[standard]==0.29.0 \
@@ -26,7 +29,8 @@ RUN pip install --no-cache-dir \
     "transformers==4.41.0" \
     "accelerate==0.30.0"
 
-RUN pip install --no-cache-dir "numpy==1.26.4"
+# Smoke test — fail the build immediately if torch can't import numpy
+RUN python -c "import numpy; import torch; print('numpy:', numpy.__version__, '| torch:', torch.__version__)"
 
 COPY --chown=user:user . .
 
