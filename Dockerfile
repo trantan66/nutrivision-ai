@@ -28,17 +28,23 @@ RUN pip install --no-cache-dir \
 
 COPY --chown=user:user . .
 
-# Pull actual YOLO model binary if Railway cloned only the Git LFS pointer
+ARG GITHUB_TOKEN
 RUN if head -c 50 model/yolobv11/best.pt 2>/dev/null | grep -q "version https://git-lfs"; then \
-    echo "Pulling YOLO model via git-lfs (Railway skipped LFS during clone)..." && \
-    GIT_TERMINAL_PROMPT=0 GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --no-tags \
-        https://github.com/trantan66/nutrivision-ai.git /tmp/lfs-repo && \
-    cd /tmp/lfs-repo && \
-    GIT_TERMINAL_PROMPT=0 git lfs pull --include="model/yolobv11/best.pt" && \
-    cp model/yolobv11/best.pt /app/model/yolobv11/best.pt && \
-    chown user:user /app/model/yolobv11/best.pt && \
-    cd / && rm -rf /tmp/lfs-repo && \
-    echo "YOLO model pulled: $(wc -c < /app/model/yolobv11/best.pt) bytes"; \
+    echo "Downloading YOLO model via GitHub LFS API (private repo)..." && \
+    LFS_OID=$(grep "^oid sha256:" model/yolobv11/best.pt | sed 's/^oid sha256://') && \
+    LFS_SIZE=$(grep "^size " model/yolobv11/best.pt | awk '{print $2}') && \
+    echo "OID: $LFS_OID  SIZE: $LFS_SIZE" && \
+    DOWNLOAD_URL=$(curl -sf \
+        -X POST \
+        -H "Content-Type: application/vnd.git-lfs+json" \
+        -H "Accept: application/vnd.git-lfs+json" \
+        -u "x-access-token:${GITHUB_TOKEN}" \
+        -d "{\"operation\":\"download\",\"transfer\":[\"basic\"],\"objects\":[{\"oid\":\"${LFS_OID}\",\"size\":${LFS_SIZE}}]}" \
+        "https://github.com/trantan66/nutrivision-ai.git/info/lfs/objects/batch" | \
+        python3 -c "import sys,json; d=json.load(sys.stdin); print(d['objects'][0]['actions']['download']['href'])") && \
+    curl -fL -o model/yolobv11/best.pt "$DOWNLOAD_URL" && \
+    chown user:user model/yolobv11/best.pt && \
+    echo "YOLO model downloaded: $(wc -c < model/yolobv11/best.pt) bytes"; \
 fi
 
 USER user
