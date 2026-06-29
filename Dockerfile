@@ -1,7 +1,7 @@
 FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
-    libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 libgl1 curl \
+    libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1 libgl1 curl git git-lfs \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd -m -u 1000 user
@@ -28,6 +28,19 @@ RUN pip install --no-cache-dir \
 
 COPY --chown=user:user . .
 
+# Pull actual YOLO model binary if Railway cloned only the Git LFS pointer
+RUN if head -c 50 model/yolobv11/best.pt 2>/dev/null | grep -q "version https://git-lfs"; then \
+    echo "Pulling YOLO model via git-lfs (Railway skipped LFS during clone)..." && \
+    GIT_LFS_SKIP_SMUDGE=1 git clone --depth=1 --no-tags \
+        https://github.com/trantan66/nutrivision-ai.git /tmp/lfs-repo && \
+    cd /tmp/lfs-repo && \
+    git lfs pull --include="model/yolobv11/best.pt" && \
+    cp model/yolobv11/best.pt /app/model/yolobv11/best.pt && \
+    chown user:user /app/model/yolobv11/best.pt && \
+    cd / && rm -rf /tmp/lfs-repo && \
+    echo "YOLO model pulled: $(wc -c < /app/model/yolobv11/best.pt) bytes"; \
+fi
+
 USER user
 EXPOSE 7860
-CMD ["sh", "/app/start.sh"]
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-7860}"]
