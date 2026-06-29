@@ -22,6 +22,7 @@ RUN pip install --no-cache-dir \
     pillow==10.3.0 \
     requests==2.31.0 \
     httpx==0.27.0 \
+    "numpy>=1.23.0,<2.0" \
     "ultralytics==8.3.0" \
     "transformers==4.41.0" \
     "accelerate==0.30.0"
