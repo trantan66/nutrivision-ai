@@ -381,10 +381,12 @@ async def get_classes():
 # YOLOv11 & Depth Anything v2 - Portion & Weight Estimation
 # ---------------------------------------------------------------------------
 YOLO_CLASSES = [
-    "banh_bao", "banh_beo", "banh_bot_loc", "banh_mi", "banh_tet",
-    "banh_trung_thu", "bun_bo_hue", "bun_dau_mam_tom", "com_lam",
-    "cua_hap", "oc_buoi_hap", "pho", "rau_muong_xao", "thit_kho_tau",
-    "xoi_xeo"
+    "banh_bao", "banh_beo", "banh_bot_loc", "banh_chung", "banh_mi",
+    "banh_tet", "banh_trang_nuong", "banh_trung_thu",
+    "bun_bo_hue", "bun_dau_mam_tom",
+    "com_chien", "com_lam", "cua_hap",
+    "goi_cuon", "nui_xao", "oc_buoi_hap",
+    "pho", "rau_muong_xao", "thit_kho_tau", "xoi_xeo"
 ]
 
 YOLO_CLASS_INFO = {
@@ -405,6 +407,11 @@ YOLO_CLASS_INFO = {
     "rau_muong_xao":  {"vi": "Rau muống xào",   "en": "Rau muong xao",  "calories_per_100g": 70,  "density_factor": 5100,  "min_w": 100, "max_w": 350},
     "thit_kho_tau":   {"vi": "Thịt kho tàu",   "en": "Thit kho tau",   "calories_per_100g": 220, "density_factor": 6700,  "min_w": 150, "max_w": 500},
     "xoi_xeo":        {"vi": "Xôi xéo",        "en": "Xoi xeo",        "calories_per_100g": 240, "density_factor": 4900,  "min_w": 150, "max_w": 500},
+    "banh_chung":     {"vi": "Bánh chưng",      "en": "Banh chung",     "calories_per_100g": 225, "density_factor": 5000,  "min_w": 200, "max_w": 600},
+    "banh_trang_nuong":{"vi": "Bánh tráng nướng","en": "Banh trang nuong","calories_per_100g": 350,"density_factor": 2500, "min_w": 50,  "max_w": 200},
+    "com_chien":      {"vi": "Cơm chiên",       "en": "Com chien",      "calories_per_100g": 180, "density_factor": 14000, "min_w": 250, "max_w": 600},
+    "goi_cuon":       {"vi": "Gỏi cuốn",        "en": "Goi cuon",       "calories_per_100g": 80,  "density_factor": 7000,  "min_w": 80,  "max_w": 250},
+    "nui_xao":        {"vi": "Nui xào",         "en": "Nui xao",        "calories_per_100g": 170, "density_factor": 12000, "min_w": 200, "max_w": 500},
 }
 
 class PredictionItem(BaseModel):
